@@ -21,8 +21,6 @@ export function buildDeck(sequence) {
   remainingCardsByStage[2] = arrayShuffle(remainingCardsByStage[2]);
   remainingCardsByStage[3] = arrayShuffle(remainingCardsByStage[3]);
 
-  console.log(remainingCardsByStage);
-
   const deck = [];
   for (var stage of sequence) {
     switch (stage) {
