@@ -1,0 +1,16 @@
+.invader-steps {
+  float: left;
+  width: 60%;
+  position: relative;
+}
+
+.invader-card-holder {
+  float: left;
+  position: relative;
+  width: 33%;
+  border-radius: 3%;
+}
+
+.active-phase {
+  background-color: #779;
+}

@@ -1,0 +1,15 @@
+.phase {
+  color: white;
+}
+
+.current-phase {
+  color: white;
+  background-color: #666;
+}
+
+.phase-tracker {
+  float: left;
+  position: relative;
+  width: 19%;
+  border: 1px solid #999;
+}

@@ -1,0 +1,26 @@
+.fear-container{
+  position: relative;
+  width: 20%;
+  float: left;
+}
+
+.fear-image img {
+  width: 100%;
+}
+
+.fear-unearned {
+  font-weight: bold;
+  font-size: 3em;
+  position: relative;
+  width:100%;
+  color: white;
+}
+
+.fear-earned {
+  font-weight: bold;
+  font-size: 3em;
+  position: relative;
+  width:100%;
+  color: white;
+}
+
