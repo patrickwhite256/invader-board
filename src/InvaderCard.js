@@ -1,46 +1,20 @@
-import React, { Component } from 'react';
 import './InvaderCard.css';
 
-class InvaderCard extends Component {
-  constructor(props) {
-    super(props);
+function InvaderCard({isNull, stage, cardID, flipped = false}) {
+  let cardURL = `/invader_s${stage}_back.png`;
+  let className= 'invader-card';
+  if (isNull) {
+    cardURL = `invader_s1_back.png`;
+    className = 'invader-card hidden';
+  } else if (flipped) {
+    cardURL = `/invader_${cardID}.png`;
+  }
 
-    this.stage = props.stage;
-    this.invaderCardID = props.invaderCardID;
-    if (props.isNull) {
-      this.isNull = props.isNull;
-      this.stage = 1;
-    }
-
-    this.state = {
-      flipped: false,
-    };
-  };
-
-  flipUp() {
-    this.setState({flipped: true});
-  };
-
-  cardFrontURL() {
-    return `/invader_${this.invaderCardID}.png`;
-  };
-
-  cardBackURL() {
-    return `/invader_s${this.stage}_back.png`;
-  };
-
-  render() {
-    if (this.isNull) {
-      return <img className="invader-card hidden" src={this.cardBackURL()} alt={this.invaderCardID}/>
-    }
-
-    var imageURL = this.cardBackURL();
-    if (this.state.flipped) {
-      imageURL = this.cardFrontURL();
-    }
-
-    return <img className="invader-card" src={imageURL} alt={this.invaderCardID}/>
-  };
-};
+  return <img className={className} src={cardURL} alt={cardID} />
+}
 
 export default InvaderCard;
+
+export function invaderCardComponentFromProps(card) {
+  return <InvaderCard isNull={card.isNull} cardID={card.invaderCardID} stage={card.stage} flipped={card.flipped} />;
+}

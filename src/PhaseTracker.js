@@ -1,5 +1,6 @@
-import React, { Component } from 'react';
+import React, { useContext } from 'react';
 import './FearCounter.css';
+import GameContext from './GameContext';
 import './PhaseTracker.css';
 
 const defaultPhases = [
@@ -14,42 +15,30 @@ const defaultPhases = [
   'Slow',
 ];
 
-class PhaseTracker extends Component {
-  constructor(props) {
-    super(props);
+export function PhaseTracker() {
+  const { phase, setPhase } = useContext(GameContext);
 
-    this.phases = defaultPhases;
-    this.advancePhaseCallback = props.advancePhaseCallback;
+  const phases = defaultPhases; // todo: allow more
 
-    this.state = {
-      currentPhase: 0,
-    };
+  const advancePhase = () => {
+    const currentPhaseN = phases.indexOf(phase);
+    setPhase(phases[(currentPhaseN + 1) % phases.length]);
   };
 
-  advancePhase() {
-    const phase = (this.state.currentPhase + 1) % this.phases.length;
+  const phaseElements = [];
 
-    this.setState({currentPhase: phase});
-
-    this.advancePhaseCallback(this.phases[phase]);
-  }
-
-  render() {
-    const phases = [];
-
-    for (var i = 0; i < this.phases.length; i++) {
-      var className = 'phase';
-      if (this.state.currentPhase === i) {
-        className = 'phase current-phase';
-      }
-
-      phases.push(<div key={i} className={className}>{this.phases[i]}</div>);
+  for (var i = 0; i < phases.length; i++) {
+    var className = 'phase';
+    if (phases[i] === phase) {
+      className = 'phase current-phase';
     }
 
-    return <div className='phase-tracker vertical-center' onClick={() => this.advancePhase()}>
-      {phases}
-    </div>;
-  };
+    phaseElements.push(<div key={i} className={className}>{phases[i]}</div>);
+  }
+
+  return <div className='phase-tracker vertical-center' onClick={() => advancePhase()}>
+    {phaseElements}
+  </div>;
 }
 
 export default PhaseTracker;
