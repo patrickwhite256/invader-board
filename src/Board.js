@@ -4,7 +4,7 @@ import FearCounter from './FearCounter.js';
 import InvaderSteps  from './InvaderSteps.js';
 import PhaseTracker from './PhaseTracker.js';
 import GameContext from './GameContext';
-import { advanceCards, buildDeck } from './game_logic.js';
+import { buildDeck, setPhase } from './game_logic.js';
 
 
 function Board() {
@@ -18,7 +18,7 @@ function Board() {
   const [ravageCard, setRavageCard] = useState({isNull: true});
   const [invaderDiscard, setInvaderDiscard] = useState([]);
 
-  const contextValue = {
+  const gameContext = {
     fear, setFear,
     phase, setPhase: baseSetPhase,
     invaderDeck, setInvaderDeck,
@@ -27,22 +27,10 @@ function Board() {
     invaderDiscard, setInvaderDiscard,
   };
 
-  const setPhase = (newPhase) => {
-    if(newPhase === 'Explore') {
-      invaderDeck[0].flipped = true;
-    }
-
-    if(phase === 'Explore') {
-      advanceCards(contextValue);
-    }
-
-    baseSetPhase(newPhase);
-  };
-
-  contextValue.setPhase = setPhase;
+  gameContext.setPhase = setPhase(gameContext, baseSetPhase);
 
   return (
-    <GameContext.Provider value={contextValue}>
+    <GameContext.Provider value={gameContext}>
       <div className="invader-board">
         <FearCounter />
         <InvaderSteps />

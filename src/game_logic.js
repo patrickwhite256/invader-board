@@ -38,8 +38,24 @@ export function buildDeck(sequence) {
   return deck;
 }
 
-export function advanceCards({invaderDiscard, buildCard, ravageCard, setBuildCard, setRavageCard, invaderDeck}) {
+function advanceCards({invaderDiscard, buildCard, ravageCard, setBuildCard, setRavageCard, invaderDeck}) {
   invaderDiscard.push(ravageCard);
   setRavageCard(buildCard);
   setBuildCard(invaderDeck.shift());
+}
+
+export function setPhase(gameContext, baseSetPhase) {
+  return (newPhase) => {
+    if(newPhase === 'Explore') {
+      if(gameContext.invaderDeck.length > 0 ) {
+        gameContext.invaderDeck[0].flipped = true;
+      } // otherwise lose!
+    }
+
+    if(gameContext.phase === 'Explore') {
+      advanceCards(gameContext.contextValue);
+    }
+
+    baseSetPhase(newPhase);
+  }
 }
