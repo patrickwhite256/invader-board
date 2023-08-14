@@ -1,6 +1,7 @@
 .fear-stack {
   height: 100%;
   width: 50%;
+  float: left;
   display: flex;
   align-content: center;
 }
@@ -9,6 +10,7 @@
   overflow: hidden;
   position: relative;
   text-align: left;
+  height: 90%;
 }
 
 .fear-card-container:last-child{

@@ -14,12 +14,12 @@ function FearCardStack() {
       const card = renderCard(fearDeck[i][j]);
       const shouldHaveDivider = j === 0 && i !== 0 && fearDeck[i-1].length > 0;
       if (shouldHaveDivider) {
-        fearCards.push(<div key={`${i}_${j}`} className="fear-card-container">
+        fearCards.push(<div key={`${i}_${j}`} className="fear-card-container vertical-center">
           {card}
           <img className="fear-divider vertical-center" src={`terror_${i+1}.png`} alt="terror"/>
         </div>);
       } else {
-        fearCards.push(<div key={`${i}_${j}`} className="fear-card-container">
+        fearCards.push(<div key={`${i}_${j}`} className="fear-card-container vertical-center">
           {card}
         </div>);
       }

@@ -6,7 +6,7 @@ export function renderCard(card) {
     case 'invader':
       return <InvaderCard isNull={card.isNull} cardID={card.cardID} stage={card.stage} flipped={card.flipped} />;
     case 'fear':
-      return <FearCard cardID={card.cardID} flipped={card.flipped} />
+      return <FearCard isNull={card.isNull} cardID={card.cardID} flipped={card.flipped} />
     default:
       return null
   }

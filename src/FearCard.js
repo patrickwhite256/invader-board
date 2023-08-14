@@ -1,11 +1,14 @@
 import './FearCard.css';
 
-function FearCard({cardID, flipped = false}) {
+function FearCard({isNull, cardID, flipped = false}) {
   let cardURL = 'fear_back.png';
-  if (flipped) {
+  let className = "fear-card vertical-center";
+  if (isNull) {
+    className = "fear-card vertical-center hidden";
+  } else if (flipped) {
     cardURL = `fear_cards/fear_${cardID}.png`;
   }
-  return <img className="fear-card vertical-center" src={cardURL} alt={cardID} />;
+  return <img className={className} src={cardURL} alt={cardID} />;
 }
 
 export default FearCard;

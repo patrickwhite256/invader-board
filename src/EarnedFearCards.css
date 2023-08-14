@@ -1,0 +1,12 @@
+.earned-fear-cards {
+  position: relative;
+  height: 100%;
+  width: 29%;
+  float: left;
+}
+
+.earned-container {
+  position: relative;
+  width: 100%;
+  height: calc(100% - 1em - 5px);
+}

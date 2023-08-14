@@ -51,7 +51,7 @@ export function buildFearDeck(expansionsEnabled, countsByStage) {
   for (const expansion in fearCardCounts) {
     if (expansionsEnabled.includes(expansion)) {
       for (let i = 0; i < fearCardCounts[expansion]; i++) {
-        fearDeck.push({type:'fear', flipped: true, cardID:`${expansion}_${i}`});
+        fearDeck.push({type:'fear', flipped: false, cardID:`${expansion}_${i}`});
       }
     }
   }

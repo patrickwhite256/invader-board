@@ -4,6 +4,7 @@ import FearCounter from './FearCounter.js';
 import FearCardStack from './FearCardStack.js';
 import InvaderSteps  from './InvaderSteps.js';
 import PhaseTracker from './PhaseTracker.js';
+import EarnedFearCards from './EarnedFearCards.js';
 import GameContext from './GameContext';
 import * as logic from './game_logic.js';
 
@@ -69,6 +70,7 @@ function Board() {
         <div className="invader-board-container" hidden={activePage !== 1} >
           <FearCounter />
           <FearCardStack />
+          <EarnedFearCards />
         </div>
         <div className="bottom-box" onClick={nextPage}><img className="down-arrow" src="chevron_up.svg" hidden={activePage === nPages - 1} alt="down"/></div>
       </div>
