@@ -1,7 +1,6 @@
 import React, { useContext } from 'react';
 import './InvaderSteps.css';
-import InvaderCard from './InvaderCard.js';
-import { invaderCardComponentFromProps } from './InvaderCard.js';
+import { renderCard } from './Card.js';
 import GameContext from './GameContext';
 
 function InvaderSteps() {
@@ -23,19 +22,19 @@ function InvaderSteps() {
     default:
   };
 
-  var exploreCard = <InvaderCard isNull={true} />;
+  var exploreCard = renderCard({isNull: true});
   if (invaderDeck.length > 0) {
-    exploreCard = invaderCardComponentFromProps(invaderDeck[0]);
+    exploreCard = renderCard(invaderDeck[0]);
   }
 
   return <div className='invader-steps vertical-center'>
     <div className={ravageClass}>
     Ravage
-    {invaderCardComponentFromProps(ravageCard)}
+    {renderCard(ravageCard)}
     </div>
     <div className={buildClass}>
     Build
-    {invaderCardComponentFromProps(buildCard)}
+    {renderCard(buildCard)}
     </div>
     <div className={exploreClass}>
     Explore

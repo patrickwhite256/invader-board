@@ -1,25 +1,16 @@
 import React, { useContext } from 'react';
 import GameContext from './GameContext.js';
 import './FearCounter.css';
-import toast from 'react-hot-toast';
 
-function FearCounter({poolSize = 4}) {
-  const { fear, setFear } = useContext(GameContext);
+function FearCounter() {
+  const { poolSize, fear, setFear } = useContext(GameContext);
 
   const addFear = () => {
-    if (fear === poolSize - 1) {
-      toast('Fear card earned!');
-    }
-
-    setFear((fear + 1) % poolSize);
+    setFear(fear + 1);
   };
 
   const removeFear = () => {
-    if (fear === 0) {
-      setFear(poolSize - 1);
-    } else {
-      setFear(fear - 1);
-    }
+    setFear(fear-1);
   };
 
   return <div className='fear-container vertical-center'>

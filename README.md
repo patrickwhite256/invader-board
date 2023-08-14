@@ -1,6 +1,6 @@
 # Spirit Island Invader Board
 
-This project aims to replace the invader board in Spirit Island to reduce the setup time table space required for the game.
+This project aims to replace the invader board in Spirit Island to reduce the setup time and table space required for the game.
 
 ## Features
 

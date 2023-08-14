@@ -1,0 +1,21 @@
+.fear-stack {
+  height: 100%;
+  width: 50%;
+  display: flex;
+  align-content: center;
+}
+
+.fear-card-container{
+  overflow: hidden;
+  position: relative;
+  text-align: left;
+}
+
+.fear-card-container:last-child{
+  overflow: visible;
+}
+
+.fear-divider {
+  position: absolute;
+  height: 90%;
+}
