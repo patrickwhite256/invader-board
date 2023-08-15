@@ -17,7 +17,6 @@ function Board() {
   const [state, dispatch] = useReducer(logic.stateReducer, {
     adversary: 'none',
     adversaryLevel: '0',
-    sequence: '111222233333',
     expansionsEnabled: {
       'Base': true,
       'BC': true,
@@ -25,19 +24,6 @@ function Board() {
       'FF': true,
     },
     playerCount: '1',
-    countsByStage: [3, 3, 3],
-    startingPoolSize: 4,
-    startingPhases: [
-      {name: 'Spirit'},
-      {name: 'Fast'},
-      {name: 'Blighted Island'},
-      {name: 'Event'},
-      {name: 'Fear'},
-      {name: 'Ravage'},
-      {name: 'Build'},
-      {name: 'Explore'},
-      {name: 'Slow'},
-    ],
     toastQueue: [],
     setupComplete: false,
   });

@@ -1,9 +1,8 @@
 import arrayShuffle from 'array-shuffle';
+import { invaderDeckModifications } from './adversaries.js';
 const _ = require('lodash');
 
 const defaultInvaderCards = '111222233333';
-const defaultFearCards = [3, 3, 3];
-const defaultFearPoolSizePerPlayer = 4;
 const defaultPhases = [
   {name: 'Spirit'},
   {name: 'Fast'},
@@ -29,7 +28,9 @@ const fearCardCounts = {
   'FF': 5,
 };
 
-export function buildInvaderDeck(sequence) {
+export function buildInvaderDeck(state) {
+  const sequence = defaultInvaderCards;
+
   let remainingCardsByStage = {
     1: [...invaderCardsByStage[1]],
     2: [...invaderCardsByStage[2]],
@@ -58,6 +59,11 @@ export function buildInvaderDeck(sequence) {
     };
   };
 
+  for (let i = 0; i <= state.adversaryLevel; i++) {
+    const mutator = invaderDeckModifications[state.adversary][i];
+    if (mutator) mutator(deck);
+  }
+
   return deck;
 }
 
@@ -74,9 +80,9 @@ export function buildFearDeck(state) {
   fearDeck = arrayShuffle(fearDeck);
 
   return [
-    fearDeck.slice(0, state.countsByStage[0]),
-    fearDeck.slice(state.countsByStage[0], state.countsByStage[0]+state.countsByStage[1]),
-    fearDeck.slice(state.countsByStage[0]+state.countsByStage[1], state.countsByStage[0]+state.countsByStage[1]+state.countsByStage[2]),
+    fearDeck.slice(0, 3),
+    fearDeck.slice(3, 6),
+    fearDeck.slice(6, 9),
   ];
 }
 
@@ -217,16 +223,22 @@ export function stateReducer(state, action) {
     case 'set_adversary_level':
       return Object.assign({}, state, { adversaryLevel: action.adversaryLevel });
     case 'setup_game':
-      const invaderDeck = buildInvaderDeck(state.sequence);
+      const playerCount = parseInt(state.playerCount);
+      const adversaryLevel = parseInt(state.adversaryLevel);
+
+      // invader deck setup
+      const invaderDeck = buildInvaderDeck(state);
       const buildCard = invaderDeck.shift();
       buildCard.flipped = true;
-      const playerCount = parseInt(state.playerCount);
+
+      let poolSize = 4 * playerCount;
+
       return Object.assign({}, state, {
         activePage: 0,
         fear: 0,
-        poolSize: state.startingPoolSize * playerCount,
+        poolSize,
         phase: 0,
-        phases: state.startingPhases,
+        phases: defaultPhases,
         invaderDeck,
         buildCard,
         ravageCard: {type:'invader', isNull: true},
@@ -236,6 +248,7 @@ export function stateReducer(state, action) {
         earnedFearCards: [],
         setupComplete: true,
         playerCount,
+        adversaryLevel,
       });
     default:
       return state;
