@@ -4,7 +4,7 @@ import { renderCard } from './Card.js';
 import { StateContext } from './GameContext.js';
 
 function InvaderSteps() {
-  const { phase, phases, ravageCard, buildCard, invaderDeck } = useContext(StateContext)
+  const { phase, phases, ravageCard, buildCard, invaderDeck, highImmigrationCard, highImmigrationEnabled } = useContext(StateContext)
 
   var ravageClass = 'invader-card-holder';
   var buildClass = 'invader-card-holder';
@@ -27,18 +27,31 @@ function InvaderSteps() {
     exploreCard = renderCard(invaderDeck[0]);
   }
 
+  let highImmigration = <></>;
+  if (highImmigrationEnabled) {
+    let highClass = 'invader-card-holder';
+    if (phases[phase].name === 'High Immigration') {
+      highClass = 'invader-card-holder active-phase';
+    }
+    highImmigration = <div className={highClass}>
+      High Immigration
+      {renderCard(highImmigrationCard)}
+    </div>
+  };
+
   return <div className='invader-steps vertical-center'>
+    {highImmigration}
     <div className={ravageClass}>
-    Ravage
-    {renderCard(ravageCard)}
+      Ravage
+      {renderCard(ravageCard)}
     </div>
     <div className={buildClass}>
-    Build
-    {renderCard(buildCard)}
+      Build
+      {renderCard(buildCard)}
     </div>
-    <div className={exploreClass}>
-    Explore
-    {exploreCard}
+      <div className={exploreClass}>
+      Explore
+      {exploreCard}
     </div>
   </div>
 }

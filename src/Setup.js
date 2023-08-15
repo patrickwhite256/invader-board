@@ -36,6 +36,8 @@ function Setup() {
       Adversary: <select value={state.adversary} onChange={setAdversary}>
         <option value="none">None</option>
         <option value="BP">Brandenburg-Prussia</option>
+        <option value="SWE">Sweden</option>
+        <option value="ENG">England</option>
       </select>
       <span hidden={state.adversary === 'none'}>
         <br />

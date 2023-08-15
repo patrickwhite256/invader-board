@@ -2,6 +2,8 @@ const _ = require('lodash');
 
 export const invaderDeckModifications = {
   'none': {},
+  'SWE': {},
+  'ENG': {},
   'BP': {
     2: (deck) => {
       const lastS3Index = _.findLastIndex(deck, (card) => card.stage === 3);
@@ -26,3 +28,23 @@ export const invaderDeckModifications = {
     },
   },
 };
+
+export const phaseModifications = {
+  'none': {},
+  'SWE': {},
+  'ENG': {
+    3: (phases) => {
+      const ravageIndex = _.findIndex(phases, (phase) => phase.name === 'Ravage');
+      phases.splice(ravageIndex, 0, {name: 'High Immigration'});
+    },
+  },
+  'BP': {},
+};
+
+export function disableHighImmigration(state) {
+  return Object.assign({}, state, {
+    highImmigrationEnabled: false,
+    phases: state.phases.filter(phase => phase.name !== 'High Immigration'),
+    phase: state.phase - 1,
+  });
+}
