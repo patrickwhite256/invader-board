@@ -1,10 +1,10 @@
 import { useContext } from 'react';
-import GameContext from './GameContext.js';
+import { StateContext } from './GameContext.js';
 import { renderCard } from './Card.js';
 import './FearCardStack.css';
 
 function FearCardStack() {
-  const { fearDeck } = useContext(GameContext);
+  const { fearDeck } = useContext(StateContext)
 
   const fearCards = [];
   for (let i = 2; i >= 0; i--) {

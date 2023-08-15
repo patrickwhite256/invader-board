@@ -1,5 +1,5 @@
 import arrayShuffle from 'array-shuffle';
-import { toast } from 'react-hot-toast';
+const _ = require('lodash');
 
 const invaderCardsByStage = {
   1: ['W', 'J', 'M', 'S'],
@@ -65,115 +65,132 @@ export function buildFearDeck(expansionsEnabled, countsByStage) {
   ];
 }
 
-function advanceCards({invaderDiscard, buildCard, ravageCard, setBuildCard, setRavageCard, invaderDeck}) {
-  invaderDiscard.push(ravageCard);
-  setRavageCard(buildCard);
-  setBuildCard(invaderDeck.shift());
+function advanceCards(state) {
+  return Object.assign({}, state, {
+    invaderDiscard: [...state.invaderDiscard, state.ravageCard],
+    ravageCard: state.ravageCard,
+    buildCard: state.invaderDeck[0],
+    invaderDeck: state.invaderDeck.slice(1),
+  });
 }
 
-export function advancePhase(gameContext, baseSetPhase) {
-  return () => {
-    let newPhase = (gameContext.phase + 1) % gameContext.phases.length;
-
-    const prevPhaseName = gameContext.phases[gameContext.phase].name;
-    const nextPhaseName = gameContext.phases[newPhase].name;
-
-    switch(prevPhaseName) {
-      case 'Explore':
-        advanceCards(gameContext);
-        break;
-      case 'Fear':
-        gameContext.setActivePage(0);
-        break;
-      default:
-    }
-
-    switch(nextPhaseName) {
-      case 'Explore':
-        if(gameContext.invaderDeck.length > 0 ) {
-          gameContext.invaderDeck[0].flipped = true;
-        } else {
-          toast('Invaders win!');
-        }
-        break;
-      case 'Fear':
-        if (gameContext.earnedFearCards.length > 0) {
-          gameContext.setActivePage(1);
-        } else {
-          newPhase += 1;
-          toast(`No fear cards; proceeding to ${gameContext.phases[newPhase].name}`);
-        }
-        break;
-      default:
-    }
-
-    baseSetPhase(newPhase);
-  };
+function toast(state, text) {
+  return Object.assign({}, state, {toastQueue: [...state.toastQueue, text]});
 }
 
-export function setPhase(gameContext, baseSetPhase) {
-  return (newPhase) => {
-    if(newPhase === 'Explore') {
-      if(gameContext.invaderDeck.length > 0 ) {
-        gameContext.invaderDeck[0].flipped = true;
+function advancePhase(state) {
+  let newPhase = (state.phase + 1) % state.phases.length;
+  let stateUpdate = {};
+
+  const prevPhaseName = state.phases[state.phase].name;
+  const nextPhaseName = state.phases[newPhase].name;
+
+  switch(prevPhaseName) {
+    case 'Explore':
+      state = advanceCards(state);
+      break;
+    case 'Fear':
+      stateUpdate.activePage = 0;
+      break;
+    default:
+  }
+
+  switch(nextPhaseName) {
+    case 'Explore':
+      if(state.invaderDeck.length > 0 ) {
+        const invaderDeck = _.cloneDeep(state.invaderDeck);
+        invaderDeck[0].flipped = true;
+        stateUpdate.invaderDeck = invaderDeck;
       } else {
-        toast('Invaders win!');
+        state = toast(state, 'Invaders win!');
       }
-    }
+      break;
+    case 'Fear':
+      if (state.earnedFearCards.length > 0) {
+        stateUpdate.activePage = 1;
+      } else {
+        newPhase += 1;
+        state = toast(state, `No fear cards; proceeding to ${state.phases[newPhase].name}`);
+      }
+      break;
+    default:
+  }
 
-    if(gameContext.phase === 'Explore') {
-      advanceCards(gameContext);
-    }
+  stateUpdate.phase = newPhase;
 
-    baseSetPhase(newPhase);
-  };
+  return Object.assign({}, state, stateUpdate);
 }
 
-function earnFearCard(gameContext) {
-  for(let i = 0; i < gameContext.fearDeck.length; i++) {
-    if (gameContext.fearDeck[i].length > 0) {
-      gameContext.earnedFearCards.push(gameContext.fearDeck[i].shift());
-      if (gameContext.fearDeck[i].length === 0) toast(`Terror level ${i+2} achieved!`);
+function earnFearCard(state) {
+  const earnedFearCards = [...state.earnedFearCards];
+  const fearDeck = _.cloneDeep(state.fearDeck);
+  for(let i = 0; i < state.fearDeck.length; i++) {
+    if (state.fearDeck[i].length > 0) {
+      earnedFearCards.push(fearDeck[i].shift());
+      if (fearDeck[i].length === 0) state = toast(state, `Terror level ${i+2} achieved!`);
       break;
     }
   }
 
-  if (gameContext.fearDeck[2].length === 0) return false
+  if (fearDeck[2].length === 0) state = toast(state, 'Spirits win!');
+  else state = toast(state, 'Fear card earned!');
 
-  return true;
+  return Object.assign({}, state, {earnedFearCards, fearDeck});
 }
 
 // TODO: doesn't always put back at right TL
-function unearnFearCard(gameContext) {
-  if (gameContext.earnedFearCards.length === 0) return false;
+function unearnFearCard(state) {
+  const earnedFearCards = [...state.earnedFearCards];
+  const fearDeck = _.cloneDeep(state.fearDeck);
+  if (earnedFearCards.length === 0) return state;
 
-  for(var i in gameContext.fearDeck) {
-    if (gameContext.fearDeck[i].length > 0) {
-      gameContext.fearDeck[i].unshift(gameContext.earnedFearCards.pop());
+  for(var i in fearDeck) {
+    if (fearDeck[i].length > 0) {
+      fearDeck[i].unshift(earnedFearCards.pop());
       break;
     }
   }
 
-  return true;
+  toast(state, 'Fear card removed');
+  return Object.assign({}, state, {earnedFearCards, fearDeck});
 }
 
+function setFear(state, delta) {
+  let newFear = state.fear + delta;
 
-export function setFear(gameContext, baseSetFear) {
-  return (newFear) => {
-    if (newFear === gameContext.poolSize) {
-      newFear = 0;
-      if (earnFearCard(gameContext)) {
-        toast('Fear card earned!');
-      } else {
-        toast('Spirits win!');
-      }
-    }
+  if (newFear === state.poolSize) {
+    newFear = 0;
+    state = earnFearCard(state);
+  }
 
-    if (newFear === -1) {
-      if (unearnFearCard(gameContext)) toast('Fear card removed');
-      newFear = gameContext.poolSize - 1;
-    }
+  if (newFear === -1) {
+    newFear = state.poolSize - 1;
+    state = unearnFearCard(state);
+  }
 
-    baseSetFear(newFear);
-  };
+  return Object.assign({}, state, {fear: newFear});
+}
+
+export function stateReducer(state, action) {
+  switch(action.type) {
+    case 'flip_earned_fear_card':
+      const earnedFearCards = [...state.earnedFearCards];
+      earnedFearCards[0].flipped = true;
+      return Object.assign({}, state, {earnedFearCards});
+    case 'resolve_earned_fear_card':
+      return Object.assign({}, state, {
+        earnedFearCards: state.earnedFearCards.slice(1),
+        fearDiscard: [...state.fearDiscard, state.earnedFearCards[0]],
+      });
+    case 'advance_phase':
+      return advancePhase(state);
+    case 'add_fear':
+      return setFear(state, action.delta);
+    case 'set_page':
+      return Object.assign({}, state, {activePage: action.page});
+    case 'toast_finished':
+      return Object.assign({}, state, {toastQueue: state.toastQueue.slice(1)});
+    default:
+      return state;
+  }
 }

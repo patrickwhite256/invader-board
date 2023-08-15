@@ -17,4 +17,7 @@ const defaultState = {
 
 const GameContext = createContext(defaultState);
 
+export const StateContext = createContext({});
+export const StateDispatchContext = createContext({});
+
 export default GameContext;

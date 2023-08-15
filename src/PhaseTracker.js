@@ -1,10 +1,15 @@
 import React, { useContext } from 'react';
 import './FearCounter.css';
-import GameContext from './GameContext';
+import { StateContext, StateDispatchContext } from './GameContext.js';
 import './PhaseTracker.css';
 
 export function PhaseTracker() {
-  const { phase, phases, advancePhase } = useContext(GameContext);
+  const { phase, phases } = useContext(StateContext)
+  const dispatch = useContext(StateDispatchContext);
+
+  const advancePhase = () => {
+    dispatch({type: 'advance_phase'});
+  };
 
   const phaseElements = [];
 
@@ -17,7 +22,7 @@ export function PhaseTracker() {
     phaseElements.push(<div key={i} className={className}>{phases[i].name}</div>);
   }
 
-  return <div className='phase-tracker vertical-center' onClick={() => advancePhase()}>
+  return <div className='phase-tracker vertical-center' onClick={advancePhase}>
     {phaseElements}
   </div>;
 }

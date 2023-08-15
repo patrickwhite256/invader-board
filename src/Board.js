@@ -1,12 +1,13 @@
-import { useState } from 'react';
+import { useReducer, useEffect } from 'react';
 import './Board.css';
 import FearCounter from './FearCounter.js';
 import FearCardStack from './FearCardStack.js';
 import InvaderSteps  from './InvaderSteps.js';
 import PhaseTracker from './PhaseTracker.js';
 import EarnedFearCards from './EarnedFearCards.js';
-import GameContext from './GameContext';
+import { StateContext, StateDispatchContext } from './GameContext';
 import * as logic from './game_logic.js';
+import { toast } from 'react-hot-toast';
 
 const nPages = 2;
 
@@ -29,66 +30,58 @@ function Board() {
     {name: 'Slow'},
   ];
 
-  const initInvaderDeck = () => { return logic.buildInvaderDeck(sequence); }
-  const initFearDeck = () => {return logic.buildFearDeck(expansionsEnabled, countsByStage)};
-
-  const [activePage, setActivePage] = useState(0);
-
-  const [fear, baseSetFear] = useState(0);
-  const [phase, baseSetPhase] = useState(0);
-  const [invaderDeck, setInvaderDeck] = useState(initInvaderDeck);
-  const [buildCard, setBuildCard] = useState({type:'invader', isNull: true});
-  const [ravageCard, setRavageCard] = useState({type:'invader', isNull: true});
-  const [invaderDiscard, setInvaderDiscard] = useState([]);
-  const [fearDeck, setFearDeck] = useState(initFearDeck);
-  const [earnedFearCards, setEarnedFearCards] = useState([]);
-  const [fearDiscard, setFearDiscard] = useState([]);
-  const [poolSize, setPoolSize] = useState(startingPoolSize);
-  const [phases, setPhases] = useState(startingPhases);
-
-  const gameContext = {
-    fear, setFear: baseSetFear,
-    phase,
-    setActivePage,
-    invaderDeck, setInvaderDeck,
-    buildCard, setBuildCard,
-    ravageCard, setRavageCard,
-    invaderDiscard, setInvaderDiscard,
-    fearDeck, setFearDeck,
-    earnedFearCards, setEarnedFearCards,
-    fearDiscard, setFearDiscard,
-    poolSize, setPoolSize,
-    phases, setPhases,
-  };
-
-  gameContext.advancePhase = logic.advancePhase(gameContext, baseSetPhase);
-  gameContext.setFear = logic.setFear(gameContext, baseSetFear);
+  const [state, dispatch] = useReducer(logic.stateReducer, {
+    activePage: 0,
+    fear: 0,
+    poolSize: startingPoolSize,
+    phase: 0,
+    phases: startingPhases,
+    invaderDeck: logic.buildInvaderDeck(sequence),
+    buildCard: {type:'invader', isNull: true},
+    ravageCard: {type:'invader', isNull: true},
+    invaderDiscard: [],
+    fearDeck: logic.buildFearDeck(expansionsEnabled, countsByStage),
+    fearDiscard: [],
+    earnedFearCards: [],
+    toastQueue: [],
+  });
 
   const nextPage = () => {
-    if (activePage < nPages - 1) setActivePage(activePage + 1);
+    if (state.activePage < nPages - 1) dispatch({type: 'set_page', page: state.activePage + 1});
   };
 
   const prevPage = () => {
-    if (activePage > 0) setActivePage(activePage - 1);
+    if (state.activePage > 0) dispatch({type: 'set_page', page: state.activePage - 1});
   };
 
+  useEffect(() => {
+    console.log('getting warm');
+    if (state.toastQueue.length === 0) return;
+    console.log("oh it's TOASTY");
+
+    toast(state.toastQueue[0]);
+    dispatch({type: 'toast_finished'});
+  });
+
   return (
-    <GameContext.Provider value={gameContext}>
-      <div className="invader-board">
-        <div className="top-box" onClick={prevPage}><img className="up-arrow" src="chevron_up.svg" hidden={activePage === 0} alt="up"/></div>
-        <div className="invader-board-container" hidden={activePage !== 0} >
-          <FearCounter />
-          <InvaderSteps />
-          <PhaseTracker />
+    <StateContext.Provider value={state}>
+      <StateDispatchContext.Provider value={dispatch} >
+        <div className="invader-board">
+          <div className="top-box" onClick={prevPage}><img className="up-arrow" src="chevron_up.svg" hidden={state.activePage === 0} alt="up"/></div>
+          <div className="invader-board-container" hidden={state.activePage !== 0} >
+            <FearCounter />
+            <InvaderSteps />
+            <PhaseTracker />
+          </div>
+          <div className="invader-board-container" hidden={state.activePage !== 1} >
+            <FearCounter />
+            <FearCardStack />
+            <EarnedFearCards />
+          </div>
+          <div className="bottom-box" onClick={nextPage}><img className="down-arrow" src="chevron_up.svg" hidden={state.activePage === nPages - 1} alt="down"/></div>
         </div>
-        <div className="invader-board-container" hidden={activePage !== 1} >
-          <FearCounter />
-          <FearCardStack />
-          <EarnedFearCards />
-        </div>
-        <div className="bottom-box" onClick={nextPage}><img className="down-arrow" src="chevron_up.svg" hidden={activePage === nPages - 1} alt="down"/></div>
-      </div>
-    </GameContext.Provider>
+      </StateDispatchContext.Provider>
+    </StateContext.Provider>
   );
 }
 

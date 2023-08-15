@@ -1,6 +1,8 @@
 import InvaderCard from './InvaderCard.js'
 import FearCard from './FearCard.js'
 
+// TODO: export null cards
+
 export function renderCard(card) {
   switch(card.type) {
     case 'invader':

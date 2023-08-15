@@ -1,10 +1,10 @@
 import React, { useContext } from 'react';
 import './InvaderSteps.css';
 import { renderCard } from './Card.js';
-import GameContext from './GameContext';
+import { StateContext } from './GameContext.js';
 
 function InvaderSteps() {
-  const { phase, phases, ravageCard, buildCard, invaderDeck } = useContext(GameContext);
+  const { phase, phases, ravageCard, buildCard, invaderDeck } = useContext(StateContext)
 
   var ravageClass = 'invader-card-holder';
   var buildClass = 'invader-card-holder';

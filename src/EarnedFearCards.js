@@ -1,23 +1,25 @@
 import { useContext } from 'react';
-import GameContext from './GameContext.js';
+import { StateContext, StateDispatchContext } from './GameContext.js';
 import { renderCard } from './Card.js';
 import './EarnedFearCards.css';
 
 function EarnedFearCards() {
-  const { advancePhase, phase, phases, earnedFearCards, setEarnedFearCards, setFearDiscard } = useContext(GameContext);
+  const { phase, phases, earnedFearCards } = useContext(StateContext)
+  const dispatch = useContext(StateDispatchContext);
 
   let card = {type: 'fear', isNull: true, flipped: true};
   if (earnedFearCards.length > 0) card = earnedFearCards[0];
 
   const flipTop = () => {
-    const newEarnedFearCards = [...earnedFearCards];
-    newEarnedFearCards[0].flipped = true;
-    setEarnedFearCards(newEarnedFearCards);
+    dispatch({type: 'flip_earned_fear_card'});
   };
 
   const resolveCard = () => {
-    setEarnedFearCards(earnedFearCards.slice(1));
-    setFearDiscard(fearDiscard => [...fearDiscard, earnedFearCards[0]]);
+    dispatch({type: 'resolve_earned_fear_card'});
+  };
+
+  const advancePhase = () => {
+    dispatch({type: 'advance_phase'});
   };
 
   return <div className="earned-fear-cards">
