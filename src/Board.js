@@ -17,6 +17,17 @@ function Board() {
   const expansionsEnabled = ['Base', 'JE', 'BC', 'FF'];
   const countsByStage = [3, 3, 3];
   const startingPoolSize = 4;
+  const startingPhases = [
+    {name: 'Spirit'},
+    {name: 'Fast'},
+    {name: 'Blighted Island'},
+    {name: 'Event'},
+    {name: 'Fear'},
+    {name: 'Ravage'},
+    {name: 'Build'},
+    {name: 'Explore'},
+    {name: 'Slow'},
+  ];
 
   const initInvaderDeck = () => { return logic.buildInvaderDeck(sequence); }
   const initFearDeck = () => {return logic.buildFearDeck(expansionsEnabled, countsByStage)};
@@ -24,19 +35,21 @@ function Board() {
   const [activePage, setActivePage] = useState(0);
 
   const [fear, baseSetFear] = useState(0);
-  const [phase, baseSetPhase] = useState('Spirit');
+  const [phase, baseSetPhase] = useState(0);
   const [invaderDeck, setInvaderDeck] = useState(initInvaderDeck);
-  const [buildCard, setBuildCard] = useState({isNull: true});
-  const [ravageCard, setRavageCard] = useState({isNull: true});
+  const [buildCard, setBuildCard] = useState({type:'invader', isNull: true});
+  const [ravageCard, setRavageCard] = useState({type:'invader', isNull: true});
   const [invaderDiscard, setInvaderDiscard] = useState([]);
   const [fearDeck, setFearDeck] = useState(initFearDeck);
   const [earnedFearCards, setEarnedFearCards] = useState([]);
   const [fearDiscard, setFearDiscard] = useState([]);
   const [poolSize, setPoolSize] = useState(startingPoolSize);
+  const [phases, setPhases] = useState(startingPhases);
 
   const gameContext = {
     fear, setFear: baseSetFear,
-    phase, setPhase: baseSetPhase,
+    phase,
+    setActivePage,
     invaderDeck, setInvaderDeck,
     buildCard, setBuildCard,
     ravageCard, setRavageCard,
@@ -45,9 +58,10 @@ function Board() {
     earnedFearCards, setEarnedFearCards,
     fearDiscard, setFearDiscard,
     poolSize, setPoolSize,
+    phases, setPhases,
   };
 
-  gameContext.setPhase = logic.setPhase(gameContext, baseSetPhase);
+  gameContext.advancePhase = logic.advancePhase(gameContext, baseSetPhase);
   gameContext.setFear = logic.setFear(gameContext, baseSetFear);
 
   const nextPage = () => {

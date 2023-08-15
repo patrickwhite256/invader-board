@@ -3,10 +3,13 @@
   height: 100%;
   width: 29%;
   float: left;
+  display: flex;
+  flex-flow: column;
 }
 
 .earned-container {
   position: relative;
   width: 100%;
-  height: calc(100% - 1em - 5px);
+  max-width: 100%;
+  min-height: 0px;
 }

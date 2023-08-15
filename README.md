@@ -7,12 +7,12 @@ This project aims to replace the invader board in Spirit Island to reduce the se
 - Track earned fear
 - Track current phase/step
 - Set up and move invader cards as appropriate
-- Track and reveal earned fear cards [TODO]
+- Track and reveal earned fear cards
 - Reveal events as appropriate [TODO]
 - Allow inspection of the relevant discards [TODO]
 - Allow setup modifications (e.g. invader deck modifications from Adversaries) [TODO]
-- Track special adversary phases (France 6, Scotland 6, HME 3/5, etc)
-- Allow special actions (moving/revealing cards early, fear pool modifications, etc)
+- Track special adversary phases (France 6, Scotland 6, HME 3/5, etc) [TODO]
+- Allow special actions (moving/revealing cards early, fear pool modifications, etc) [TODO]
 
 ## Running
 

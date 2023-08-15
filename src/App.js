@@ -1,8 +1,17 @@
+import { useState } from 'react';
 import { Toaster } from 'react-hot-toast';
 import Board from './Board.js';
+import Overlay from './Overlay.js';
+import OverlayContext from './OverlayContext.js';
 
 function App() {
-  return (<>
+  const [overlayImage, setOverlayImage] = useState('');
+
+  const overlayContext = {
+    overlayImage, setOverlayImage,
+  };
+
+  return (<OverlayContext.Provider value={overlayContext} >
     <Board />
     <Toaster
       position="bottom-center"
@@ -14,7 +23,8 @@ function App() {
         },
       }}
     />
-  </>);
+    <Overlay />
+  </OverlayContext.Provider>);
 }
 
 export default App;

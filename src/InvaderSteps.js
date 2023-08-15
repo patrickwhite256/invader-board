@@ -4,12 +4,12 @@ import { renderCard } from './Card.js';
 import GameContext from './GameContext';
 
 function InvaderSteps() {
-  const { phase, ravageCard, buildCard, invaderDeck } = useContext(GameContext);
+  const { phase, phases, ravageCard, buildCard, invaderDeck } = useContext(GameContext);
 
   var ravageClass = 'invader-card-holder';
   var buildClass = 'invader-card-holder';
   var exploreClass = 'invader-card-holder';
-  switch(phase) {
+  switch(phases[phase].name) {
     case 'Ravage':
       ravageClass = 'invader-card-holder active-phase';
       break;
@@ -22,7 +22,7 @@ function InvaderSteps() {
     default:
   };
 
-  var exploreCard = renderCard({isNull: true});
+  var exploreCard = renderCard({type:'invader', isNull: true});
   if (invaderDeck.length > 0) {
     exploreCard = renderCard(invaderDeck[0]);
   }

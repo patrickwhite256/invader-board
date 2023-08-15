@@ -71,6 +71,46 @@ function advanceCards({invaderDiscard, buildCard, ravageCard, setBuildCard, setR
   setBuildCard(invaderDeck.shift());
 }
 
+export function advancePhase(gameContext, baseSetPhase) {
+  return () => {
+    let newPhase = (gameContext.phase + 1) % gameContext.phases.length;
+
+    const prevPhaseName = gameContext.phases[gameContext.phase].name;
+    const nextPhaseName = gameContext.phases[newPhase].name;
+
+    switch(prevPhaseName) {
+      case 'Explore':
+        advanceCards(gameContext);
+        break;
+      case 'Fear':
+        gameContext.setActivePage(0);
+        break;
+      default:
+    }
+
+    switch(nextPhaseName) {
+      case 'Explore':
+        if(gameContext.invaderDeck.length > 0 ) {
+          gameContext.invaderDeck[0].flipped = true;
+        } else {
+          toast('Invaders win!');
+        }
+        break;
+      case 'Fear':
+        if (gameContext.earnedFearCards.length > 0) {
+          gameContext.setActivePage(1);
+        } else {
+          newPhase += 1;
+          toast(`No fear cards; proceeding to ${gameContext.phases[newPhase].name}`);
+        }
+        break;
+      default:
+    }
+
+    baseSetPhase(newPhase);
+  };
+}
+
 export function setPhase(gameContext, baseSetPhase) {
   return (newPhase) => {
     if(newPhase === 'Explore') {
@@ -90,9 +130,10 @@ export function setPhase(gameContext, baseSetPhase) {
 }
 
 function earnFearCard(gameContext) {
-  for(var i in gameContext.fearDeck) {
+  for(let i = 0; i < gameContext.fearDeck.length; i++) {
     if (gameContext.fearDeck[i].length > 0) {
       gameContext.earnedFearCards.push(gameContext.fearDeck[i].shift());
+      if (gameContext.fearDeck[i].length === 0) toast(`Terror level ${i+2} achieved!`);
       break;
     }
   }
@@ -119,7 +160,6 @@ function unearnFearCard(gameContext) {
 
 export function setFear(gameContext, baseSetFear) {
   return (newFear) => {
-    console.log(gameContext);
     if (newFear === gameContext.poolSize) {
       newFear = 0;
       if (earnFearCard(gameContext)) {
