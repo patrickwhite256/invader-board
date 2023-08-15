@@ -1,6 +1,21 @@
 import arrayShuffle from 'array-shuffle';
 const _ = require('lodash');
 
+const defaultInvaderCards = '111222233333';
+const defaultFearCards = [3, 3, 3];
+const defaultFearPoolSizePerPlayer = 4;
+const defaultPhases = [
+  {name: 'Spirit'},
+  {name: 'Fast'},
+  {name: 'Blighted Island'},
+  {name: 'Event'},
+  {name: 'Fear'},
+  {name: 'Ravage'},
+  {name: 'Build'},
+  {name: 'Explore'},
+  {name: 'Slow'},
+];
+
 const invaderCardsByStage = {
   1: ['W', 'J', 'M', 'S'],
   2: ['We', 'Je', 'Me', 'Se', 'C'],
@@ -46,10 +61,10 @@ export function buildInvaderDeck(sequence) {
   return deck;
 }
 
-export function buildFearDeck(expansionsEnabled, countsByStage) {
+export function buildFearDeck(state) {
   let fearDeck = [];
   for (const expansion in fearCardCounts) {
-    if (expansionsEnabled.includes(expansion)) {
+    if (state.expansionsEnabled[expansion]) {
       for (let i = 0; i < fearCardCounts[expansion]; i++) {
         fearDeck.push({type:'fear', flipped: false, cardID:`${expansion}_${i}`});
       }
@@ -59,9 +74,9 @@ export function buildFearDeck(expansionsEnabled, countsByStage) {
   fearDeck = arrayShuffle(fearDeck);
 
   return [
-    fearDeck.slice(0, countsByStage[0]),
-    fearDeck.slice(countsByStage[0], countsByStage[0]+countsByStage[1]),
-    fearDeck.slice(countsByStage[0]+countsByStage[1], countsByStage[0]+countsByStage[1]+countsByStage[2]),
+    fearDeck.slice(0, state.countsByStage[0]),
+    fearDeck.slice(state.countsByStage[0], state.countsByStage[0]+state.countsByStage[1]),
+    fearDeck.slice(state.countsByStage[0]+state.countsByStage[1], state.countsByStage[0]+state.countsByStage[1]+state.countsByStage[2]),
   ];
 }
 
@@ -190,6 +205,38 @@ export function stateReducer(state, action) {
       return Object.assign({}, state, {activePage: action.page});
     case 'toast_finished':
       return Object.assign({}, state, {toastQueue: state.toastQueue.slice(1)});
+    // setup events
+    case 'toggle_expansion':
+      const expansionsEnabled = {...state.expansionsEnabled};
+      expansionsEnabled[action.expansion] = !expansionsEnabled[action.expansion];
+      return Object.assign({}, state, { expansionsEnabled });
+    case 'set_player_count':
+      return Object.assign({}, state, { playerCount: action.playerCount });
+    case 'set_adversary':
+      return Object.assign({}, state, { adversary: action.adversary });
+    case 'set_adversary_level':
+      return Object.assign({}, state, { adversaryLevel: action.adversaryLevel });
+    case 'setup_game':
+      const invaderDeck = buildInvaderDeck(state.sequence);
+      const buildCard = invaderDeck.shift();
+      buildCard.flipped = true;
+      const playerCount = parseInt(state.playerCount);
+      return Object.assign({}, state, {
+        activePage: 0,
+        fear: 0,
+        poolSize: state.startingPoolSize * playerCount,
+        phase: 0,
+        phases: state.startingPhases,
+        invaderDeck,
+        buildCard,
+        ravageCard: {type:'invader', isNull: true},
+        invaderDiscard: [],
+        fearDeck: buildFearDeck(state),
+        fearDiscard: [],
+        earnedFearCards: [],
+        setupComplete: true,
+        playerCount,
+      });
     default:
       return state;
   }
