@@ -15,6 +15,8 @@ const defaultPhases = [
   {name: 'Slow', flags: []},
 ];
 
+const adversaries = ['BP', 'ENG', 'SWE', 'FRA', 'HLC', 'RUS', 'SCO'];
+
 const invaderCardsByStage = {
   1: ['W', 'J', 'M', 'S'],
   2: ['We', 'Je', 'Me', 'Se', 'C'],
@@ -37,26 +39,15 @@ export function buildInvaderDeck(state) {
     3: [...invaderCardsByStage[3]],
   };
 
-  if (sequence.includes('C')) {
-    remainingCardsByStage[2].pop();
-  }
-
   remainingCardsByStage[1] = arrayShuffle(remainingCardsByStage[1]);
   remainingCardsByStage[2] = arrayShuffle(remainingCardsByStage[2]);
   remainingCardsByStage[3] = arrayShuffle(remainingCardsByStage[3]);
 
   const deck = [];
   for (var stage of sequence) {
-    switch (stage) {
-      case 'C':
-        deck.push({stage: 2, invaderCardID: 'C'});
-        break;
-      default:
-        const stageNumber = parseInt(stage);
-        const invaderCardID = remainingCardsByStage[stageNumber].pop();
-        deck.push({type: 'invader', stage: stageNumber, cardID: invaderCardID, flipped: false});
-        break;
-    };
+    const stageNumber = parseInt(stage);
+    const invaderCardID = remainingCardsByStage[stageNumber].pop();
+    deck.push({type: 'invader', stage: stageNumber, cardID: invaderCardID, flipped: false});
   };
 
   for (let i = 0; i <= state.adversaryLevel; i++) {
@@ -103,6 +94,11 @@ function advanceCards(state) {
       updatedState.invaderDiscard = [...state.invaderDiscard, state.highImmigrationCard];
       updatedState.highImmigrationCard = state.ravageCard;
     }
+  }
+
+  if (updatedState.invaderDeck[0].type === 'hlc_reminder') {
+    updatedState = toast(updatedState, 'Habsburg\'s Wave of Immigration: add city and towns');
+    updatedState.invaderDeck.shift();
   }
 
   return updatedState;
@@ -217,41 +213,50 @@ function setupPhases(state) {
 }
 
 function setupGame(state) {
+  const updatedState = Object.assign({}, state);
   const playerCount = parseInt(state.playerCount);
   const adversaryLevel = parseInt(state.adversaryLevel);
   const toastQueue = [];
 
-  // invader deck setup
-  const invaderDeck = buildInvaderDeck(state);
+  if (updatedState.adversary === 'RNG') {
+    updatedState.adversary = adversaries[_.random(adversaries.length)-1];
+  }
+
+  // invader cards setup
+  const invaderDeck = buildInvaderDeck(updatedState);
   const invaderDiscard = [];
 
-  if (state.adversary === 'SW' && adversaryLevel >= 4) {
-    const discarded = invaderDeck.shift();
-    invaderDiscard.push(discarded);
-    toastQueue.push(`Sweden discard: ${discarded.cardID}`);
+  if (updatedState.adversary === 'HLC' && adversaryLevel >= 5) {
+    invaderDeck.splice(5, 0, {type:'hlc_reminder'});
   }
 
   const buildCard = invaderDeck.shift();
   buildCard.flipped = true;
 
+  if (updatedState.adversary === 'SWE' && adversaryLevel >= 4) {
+    const discarded = invaderDeck.shift();
+    invaderDiscard.push(discarded);
+    toastQueue.push(`Sweden discard: ${discarded.cardID}`);
+  }
+
   let poolSize = 4 * playerCount;
-  if (state.adversary === 'ENG' && adversaryLevel === 6) poolSize = 5 * playerCount;
+  if (updatedState.adversary === 'ENG' && adversaryLevel === 6) poolSize = 5 * playerCount;
 
   let highImmigrationEnabled = false;
-  if (state.adversary === 'ENG' && adversaryLevel >= 3) highImmigrationEnabled = true;
+  if (updatedState.adversary === 'ENG' && adversaryLevel >= 3) highImmigrationEnabled = true;
 
-  return Object.assign({}, state, {
+  return Object.assign({}, updatedState, {
     activePage: 0,
     fear: 0,
     poolSize,
     phase: 0,
-    phases: setupPhases(state),
+    phases: setupPhases(updatedState),
     invaderDeck,
     buildCard,
     ravageCard: {type:'invader', isNull: true},
     highImmigrationCard: {type:'invader', isNull: true},
     invaderDiscard,
-    fearDeck: buildFearDeck(state),
+    fearDeck: buildFearDeck(updatedState),
     fearDiscard: [],
     earnedFearCards: [],
     setupComplete: true,

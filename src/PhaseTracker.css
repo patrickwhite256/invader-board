@@ -8,7 +8,7 @@
 
 .phase:last-child {
   border-bottom: unset;
-};
+}
 
 .current-phase {
   color: white;

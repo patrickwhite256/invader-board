@@ -38,6 +38,11 @@ function Setup() {
         <option value="BP">Brandenburg-Prussia</option>
         <option value="SWE">Sweden</option>
         <option value="ENG">England</option>
+        <option value="FRA">France</option>
+        <option value="HLC">Habsburg Livestock Colony</option>
+        <option value="SCO">Scotland</option>
+        <option value="RUS">Russia</option>
+        <option value="RNG">Random</option>
       </select>
       <span hidden={state.adversary === 'none'}>
         <br />
