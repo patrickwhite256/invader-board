@@ -1,6 +1,14 @@
 .phase {
   color: white;
+  border-bottom: 1px dotted white;
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
 }
+
+.phase:last-child {
+  border-bottom: unset;
+};
 
 .current-phase {
   color: white;
@@ -12,4 +20,8 @@
   position: relative;
   width: 19%;
   border: 1px solid #999;
+}
+
+.phase-flag {
+  height: 1em;
 }

@@ -29,13 +29,21 @@ export const invaderDeckModifications = {
   },
 };
 
+function applyFlag(phases, phaseName, flagName) {
+    const phaseIndex = _.findIndex(phases, (phase) => phase.name === phaseName);
+    phases[phaseIndex].flags.push(flagName);
+}
+
 export const phaseModifications = {
   'none': {},
-  'SWE': {},
+  'SWE': {
+    1: (phases) => { applyFlag(phases, 'Ravage', 'SWE') },
+  },
   'ENG': {
+    1: (phases) => { applyFlag(phases, 'Build', 'ENG') },
     3: (phases) => {
       const ravageIndex = _.findIndex(phases, (phase) => phase.name === 'Ravage');
-      phases.splice(ravageIndex, 0, {name: 'High Immigration'});
+      phases.splice(ravageIndex, 0, {name: 'High Immigration', flags: ['ENG']});
     },
   },
   'BP': {},

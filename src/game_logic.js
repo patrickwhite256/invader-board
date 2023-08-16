@@ -4,15 +4,15 @@ const _ = require('lodash');
 
 const defaultInvaderCards = '111222233333';
 const defaultPhases = [
-  {name: 'Spirit'},
-  {name: 'Fast'},
-  {name: 'Blighted Island'},
-  {name: 'Event'},
-  {name: 'Fear'},
-  {name: 'Ravage'},
-  {name: 'Build'},
-  {name: 'Explore'},
-  {name: 'Slow'},
+  {name: 'Spirit', flags: []},
+  {name: 'Fast', flags: []},
+  {name: 'Blighted Island', flags: []},
+  {name: 'Event', flags: []},
+  {name: 'Fear', flags: []},
+  {name: 'Ravage', flags: []},
+  {name: 'Build', flags: []},
+  {name: 'Explore', flags: []},
+  {name: 'Slow', flags: []},
 ];
 
 const invaderCardsByStage = {
@@ -206,7 +206,7 @@ function setFear(state, delta) {
 }
 
 function setupPhases(state) {
-  const phases = [...defaultPhases];
+  const phases = _.cloneDeep(defaultPhases);
 
   for (let i = 0; i <= state.adversaryLevel; i++) {
     const mutator = phaseModifications[state.adversary][i];
