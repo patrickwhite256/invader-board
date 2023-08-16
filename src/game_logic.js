@@ -1,5 +1,5 @@
 import arrayShuffle from 'array-shuffle';
-import { invaderDeckModifications, phaseModifications, disableHighImmigration } from './adversaries.js';
+import { invaderDeckModifications, phaseModifications, disableHighImmigration, extraFearCards } from './adversaries.js';
 const _ = require('lodash');
 
 const defaultInvaderCards = '111222233333';
@@ -70,10 +70,18 @@ export function buildFearDeck(state) {
 
   fearDeck = arrayShuffle(fearDeck);
 
+  const terrorLevelCounts = [3, 3, 3];
+
+  if (state.adversaryLevel > 0) {
+    terrorLevelCounts[0] += extraFearCards[state.adversary][state.adversaryLevel][0];
+    terrorLevelCounts[1] += extraFearCards[state.adversary][state.adversaryLevel][1];
+    terrorLevelCounts[2] += extraFearCards[state.adversary][state.adversaryLevel][2];
+  }
+
   return [
-    fearDeck.slice(0, 3),
-    fearDeck.slice(3, 6),
-    fearDeck.slice(6, 9),
+    fearDeck.slice(0, terrorLevelCounts[0]),
+    fearDeck.slice(terrorLevelCounts[0], terrorLevelCounts[0]+terrorLevelCounts[1]),
+    fearDeck.slice(terrorLevelCounts[0]+terrorLevelCounts[1], terrorLevelCounts[0]+terrorLevelCounts[1]+terrorLevelCounts[2]),
   ];
 }
 

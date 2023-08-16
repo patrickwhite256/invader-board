@@ -80,7 +80,16 @@ export const invaderDeckModifications = {
       deck[lastS1Index] = deck.splice(lastS3Index, 1)[0];
     },
   },
-  'RUS': {},
+  'RUS': {
+    4: (deck) => {
+      for (let i = 0; i < deck.length; i++ ){
+        if (deck[i].stage === 2) {
+          const lastS3Index = _.findLastIndex(deck, (card) => card.stage === 3);
+          deck.splice(i+1, 0, deck.splice(lastS3Index, 1)[0]);
+        }
+      }
+    },
+  },
 };
 
 function applyFlag(phaseName, flagName) {
@@ -128,7 +137,73 @@ export const phaseModifications = {
       phases.splice(ravageIndex+1, 0, {name: 'Exports Fuel Inward Growth', flags: ['SCO']});
     },
   },
-  'RUS': {},
+  'RUS': {
+    1: applyFlag('Ravage', 'RUS'),
+    6: (phases) => {
+      const ravageIndex = _.findIndex(phases, (phase) => phase.name === 'Ravage');
+      phases.splice(ravageIndex+1, 0, {name: 'Pressure for Fast Profit', flags: ['RUS']});
+    },
+  },
+};
+
+export const extraFearCards = {
+  'none': {},
+  'BP': {
+    1: [0, 0, 0],
+    2: [0, 0, 0],
+    3: [0, 1, 0],
+    4: [1, 1, 0],
+    5: [1, 1, 0],
+    6: [1, 1, 1],
+  },
+  'ENG': {
+    1: [0, 1, 0],
+    2: [1, 1, 0],
+    3: [1, 2, 1],
+    4: [1, 2, 2],
+    5: [1, 2, 2],
+    6: [1, 2, 1],
+  },
+  'SWE': {
+    1: [0, 0, 0],
+    2: [0, 1, 0],
+    3: [0, 1, 0],
+    4: [0, 1, 1],
+    5: [1, 1, 1],
+    6: [1, 1, 2],
+  },
+  'FRA': {
+    1: [0, 0, 0],
+    2: [0, 1, 0],
+    3: [1, 1, 0],
+    4: [1, 1, 1],
+    5: [1, 2, 1],
+    6: [1, 2, 2],
+  },
+  'HLC': {
+    1: [0, 1, 0],
+    2: [1, 2, -1],
+    3: [1, 2, 0],
+    4: [1, 2, 0],
+    5: [1, 3, 0],
+    6: [2, 3, 0],
+  },
+  'RUS': {
+    1: [0, 0, 1],
+    2: [1, 0, 1],
+    3: [1, 1, 0],
+    4: [1, 1, 1],
+    5: [1, 2, 1],
+    6: [2, 2, 1],
+  },
+  'SCO': {
+    1: [0, 1, 0],
+    2: [1, 1, 0],
+    3: [1, 2, 1],
+    4: [2, 2, 1],
+    5: [2, 3, 1],
+    6: [3, 3, 1],
+  },
 };
 
 export function disableHighImmigration(state) {
