@@ -1,6 +1,7 @@
 {
   "name": "invader-board",
   "version": "0.1.0",
+  "homepage": "https://patrickwhite.github.io/invader-board",
   "private": true,
   "devDepenencies": {
     "@babel/plugin-proposal-private-property-in-object": "*"
