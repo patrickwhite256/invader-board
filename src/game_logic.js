@@ -79,28 +79,31 @@ export function buildFearDeck(state) {
   }
 
   return [
-    fearDeck.slice(0, terrorLevelCounts[0]),
-    fearDeck.slice(terrorLevelCounts[0], terrorLevelCounts[0]+terrorLevelCounts[1]),
-    fearDeck.slice(terrorLevelCounts[0]+terrorLevelCounts[1], terrorLevelCounts[0]+terrorLevelCounts[1]+terrorLevelCounts[2]),
+    ...fearDeck.slice(0, terrorLevelCounts[0]),
+    {type:'fear_divider', level: 2},
+    ...fearDeck.slice(terrorLevelCounts[0], terrorLevelCounts[0]+terrorLevelCounts[1]),
+    {type:'fear_divider', level: 3},
+    ...fearDeck.slice(terrorLevelCounts[0]+terrorLevelCounts[1], terrorLevelCounts[0]+terrorLevelCounts[1]+terrorLevelCounts[2]),
   ];
 }
 
 function advanceCards(state) {
   let updatedState = Object.assign({}, state, {
-    invaderDiscard: [...state.invaderDiscard, state.ravageCard],
-    ravageCard: state.buildCard,
-    buildCard: state.invaderDeck[0],
+    invaderDiscard: [...state.invaderDiscard, ...state.ravageCards],
+    ravageCards: state.buildCards,
+    buildCards: [state.invaderDeck[0]],
     invaderDeck: state.invaderDeck.slice(1),
   });
 
 
   if (state.highImmigrationEnabled) {
-    if (state.adversaryLevel === 3 && state.ravageCard.stage === 2) {
-      updatedState.invaderDiscard = [...state.invaderDiscard, state.highImmigrationCard, state.ravageCard];
+    const anyRavageCardIsStage2 = state.ravageCards.reduce((anyStage2, card) => anyStage2 || card.stage === 2, false);
+    if (state.adversaryLevel === 3 && anyRavageCardIsStage2) {
+      updatedState.invaderDiscard = [...state.invaderDiscard, ...state.highImmigrationCards, ...state.ravageCards];
       updatedState = disableHighImmigration(updatedState);
     } else {
-      updatedState.invaderDiscard = [...state.invaderDiscard, state.highImmigrationCard];
-      updatedState.highImmigrationCard = state.ravageCard;
+      updatedState.invaderDiscard = [...state.invaderDiscard, ...state.highImmigrationCards];
+      updatedState.highImmigrationCards = state.ravageCards;
     }
   }
 
@@ -162,34 +165,30 @@ function advancePhase(state) {
 function earnFearCard(state) {
   const earnedFearCards = [...state.earnedFearCards];
   const fearDeck = _.cloneDeep(state.fearDeck);
-  for(let i = 0; i < state.fearDeck.length; i++) {
-    if (state.fearDeck[i].length > 0) {
-      earnedFearCards.push(fearDeck[i].shift());
-      if (fearDeck[i].length === 0) state = toast(state, `Terror level ${i+2} achieved!`);
-      break;
+  earnedFearCards.push(fearDeck.shift());
+
+  if (fearDeck.length === 0) {
+    state = toast(state, 'Spirits win!');
+  } else {
+    state = toast(state, 'Fear card earned!');
+    if (fearDeck[0].type === 'fear_divider') {
+      state = toast(state, `Terror level ${fearDeck[0].level} achieved!`);
+      fearDeck.shift();
     }
   }
-
-  if (fearDeck[2].length === 0) state = toast(state, 'Spirits win!');
-  else state = toast(state, 'Fear card earned!');
 
   return Object.assign({}, state, {earnedFearCards, fearDeck});
 }
 
-// TODO: doesn't always put back at right TL
+// TODO: doesn't put back at right TL
 function unearnFearCard(state) {
   const earnedFearCards = [...state.earnedFearCards];
   const fearDeck = _.cloneDeep(state.fearDeck);
   if (earnedFearCards.length === 0) return state;
 
-  for(var i in fearDeck) {
-    if (fearDeck[i].length > 0) {
-      fearDeck[i].unshift(earnedFearCards.pop());
-      break;
-    }
-  }
+  fearDeck.unshift(earnedFearCards.pop());
 
-  toast(state, 'Fear card removed');
+  state = toast(state, 'Fear card removed');
   return Object.assign({}, state, {earnedFearCards, fearDeck});
 }
 
@@ -238,8 +237,8 @@ function setupGame(state) {
     invaderDeck.splice(5, 0, {type:'hlc_reminder'});
   }
 
-  const buildCard = invaderDeck.shift();
-  buildCard.flipped = true;
+  const buildCards = [invaderDeck.shift()];
+  buildCards[0].flipped = true;
 
   if (updatedState.adversary === 'SWE' && adversaryLevel >= 4) {
     const discarded = invaderDeck.shift();
@@ -260,9 +259,9 @@ function setupGame(state) {
     phase: 0,
     phases: setupPhases(updatedState),
     invaderDeck,
-    buildCard,
-    ravageCard: {type:'invader', isNull: true},
-    highImmigrationCard: {type:'invader', isNull: true},
+    buildCards,
+    ravageCards: [{type:'invader', isNull: true}],
+    highImmigrationCards: [{type:'invader', isNull: true}],
     invaderDiscard,
     fearDeck: buildFearDeck(updatedState),
     fearDiscard: [],

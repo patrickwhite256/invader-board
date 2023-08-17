@@ -57,8 +57,10 @@ export const invaderDeckModifications = {
       if (usedS2Cards.includes('C')) {
         const coastIndex = _.findIndex(deck, c => c.cardID === 'C');
         [deck[coastIndex], deck[thirdS2Index]] = [deck[thirdS2Index], deck[coastIndex]];
+        deck[coastIndex].flipped = true;
       } else {
         deck[thirdS2Index].cardID = 'C';
+        deck[thirdS2Index].flipped = true;
       }
 
       let boostedS2Cards = 0;

@@ -9,6 +9,11 @@
 .invader-card-holder {
   position: relative;
   border-radius: 3%;
+  flex: 1 1 0;
+}
+
+.invader-card-holder img {
+  width: 90%;
 }
 
 .active-phase {

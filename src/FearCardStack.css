@@ -3,21 +3,24 @@
   width: 50%;
   float: left;
   display: flex;
+  flex-wrap: wrap;
   align-content: center;
 }
 
-.fear-card-container{
-  overflow: hidden;
+.fear-stack > div {
+  height: 90%;
+}
+
+.card-stack {
   position: relative;
-  text-align: left;
-  height: 90%;
+  height: 100%;
+  max-height: 100%;
+  width: 100%;
 }
 
-.fear-card-container:last-child{
-  overflow: visible;
-}
-
-.fear-divider {
+.card-container {
   position: absolute;
-  height: 90%;
+  height: 100%;
+  width: auto;
+  display: inline-block;
 }
