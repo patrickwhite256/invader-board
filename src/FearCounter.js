@@ -16,7 +16,7 @@ function FearCounter() {
 
   return <div className='fear-container vertical-center'>
     <div className='fear-unearned' onClick={() => removeFear()}>{poolSize - fear}</div>
-    <div className='fear-image' onClick={() => addFear()}><img src="/fear.webp" alt="fear"/></div>
+    <div className='fear-image' onClick={() => addFear()}><img src="fear.webp" alt="fear"/></div>
     <div className='fear-earned' onClick={() => addFear()}>{fear}</div>
   </div>
 }
